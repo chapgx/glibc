@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// #define G_STD_IMPLEMENT
+// #define GLIBC_IMPLEMENT
 
 #ifndef GCORE
 #define GCORE
@@ -31,7 +31,7 @@ Slice g_buffer_new(u64 s);
 // Returns a new buffer from the pre allocated memory passed in
 Slice g_buffer_from_mem(u8 *b, u64 size);
 
-#if defined(G_STD_IMPLEMENT)
+#if defined(GLIBC_IMPLEMENT)
 
 Slice g_buffer_new(u64 s) {
   Slice buff = {.len = s};
@@ -73,7 +73,7 @@ int g_ringbuffer_write(RingBuffer *rb, Slice *b);
 
 #endif // end G_RING_BUFFER
 
-#if defined(G_STD_IMPLEMENT)
+#if defined(GLIBC_IMPLEMENT)
 
 // creates a new ring buffer
 RingBuffer g_ringbuffer_new(u64 size) {
@@ -131,7 +131,7 @@ Str g_str_append(Str x, Str y);
 void g_str_free(Str *s);
 #endif
 
-#if defined(G_STD_IMPLEMENT)
+#if defined(GLIBC_IMPLEMENT)
 Str g_str_new(char *content) {
   Str s = {.content = content};
 
@@ -180,4 +180,4 @@ void g_str_free(Str *s) {
   s->content = 0;
 }
 
-#endif // G_STD_IMPLEMENT
+#endif // GLIBC_IMPLEMENT

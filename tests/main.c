@@ -1,5 +1,5 @@
 #include "stdio.h"
-#define G_STD_IMPLEMENT
+#define GLIBC_IMPLEMENT
 #include "../glibc.h"
 
 int main(void) {
