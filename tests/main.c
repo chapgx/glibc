@@ -3,10 +3,11 @@
 #include "../glibc.h"
 
 int main(void) {
-  u8 *hello = "hello world";
-  Slice buff = g_buffer_from_mem(hello, 11);
+  char *hello = "hello world";
+  Slice buff = g_slice_from((u8 *)hello, 0, 5);
   RingBuffer rb = g_ringbuffer_new(KiB(2));
-  int written = g_ringbuffer_write(&rb, &buff);
+  g_ringbuffer_write(&rb, &buff);
+
   printf("%zu\n", buff.len);
   printf("head=%i\n", rb.head);
   printf("tail=%i\n", rb.tail);

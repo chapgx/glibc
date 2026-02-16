@@ -5,6 +5,15 @@
 
 // #define GLIBC_IMPLEMENT
 
+#define assert(expr, msg)                                                      \
+  if (!(expr)) {                                                               \
+    printf("\n1: ");                                                           \
+    printf(msg "\n");                                                          \
+    printf("2: Expression: %s\n3: File: %s\n4: Line %d\n\n", #expr, __FILE__,  \
+           __LINE__);                                                          \
+    abort();                                                                   \
+  }
+
 #ifndef GCORE
 #define GCORE
 
@@ -20,21 +29,32 @@ typedef uint64_t u64;
 #define MiB(n) ((u64)(n) << 20)
 #define GiB(n) ((u64)(n) << 30)
 
+// A slice contains a pointer to the underlying array
 typedef struct Slice {
   u64 len;
+  u64 cap;
   u8 *bytes;
 } Slice;
 
-// new buffer allocates memory based on s
-Slice g_buffer_new(u64 s);
+/// New [Slice] allocates memory based on s
+Slice g_slice_new(u64 s);
 
-// Returns a new buffer from the pre allocated memory passed in
-Slice g_buffer_from_mem(u8 *b, u64 size);
+// Returns a new [Slice] from the `b` based on the start and end. This does not
+// allocate memory.
+//
+// @param b - pointer to array
+// @param start - start of [Slice] inclusive
+// @param end - end of [Slice] exclusive
+Slice g_slice_from(u8 *b, u8 start, u8 end);
+
+// Append b to s if the capacity of s minus the len of s does not have enough
+// space for b then a new allocation happens and the data is copied.
+int g_slice_append(Slice *s, u8 *b);
 
 #if defined(GLIBC_IMPLEMENT)
 
-Slice g_buffer_new(u64 s) {
-  Slice buff = {.len = s};
+Slice g_slice_new(u64 s) {
+  Slice buff = {.len = s, .cap = s};
   buff.bytes = (u8 *)malloc(buff.len);
   if (buff.bytes == NULL) {
     // TODO: handle memory error
@@ -42,10 +62,16 @@ Slice g_buffer_new(u64 s) {
   return buff;
 }
 
-Slice g_buffer_from_mem(u8 *b, u64 size) {
-  Slice buff = {.len = size, .bytes = b};
+Slice g_slice_from(u8 *b, u8 start, u8 end) {
+  // TODO: maybe do something if end is less that start
+  assert(end > start, "expected start to be less than end");
+  u8 *startat = b + start;
+  u64 len = (u64)(end - start);
+  Slice buff = {.len = len, .bytes = startat, .cap = len};
   return buff;
 }
+
+// TODO: implement g_slice_append
 
 #endif
 
